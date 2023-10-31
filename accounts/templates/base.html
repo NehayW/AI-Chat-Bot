@@ -1,0 +1,260 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'side_nav.css' %}">
+    <link rel="stylesheet" href="{% static 'form.css' %}">
+    <link rel="stylesheet" href="{% static 'chatbox.css' %}">
+    <script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script>
+    {% block stylecontent %} {% endblock %}
+    <title>
+    {% block titlecontent %} {% endblock %}
+</title>
+</head>
+<body>
+  <aside>
+    <div class="sidebar">
+        {% if request.user.is_authenticated %}
+        
+          <a id="selected_prompt" class="text-center border d-md-block d-none" href="{% url 'chat:home' %}" >{% if  request.session.bot_name%}{{request.session.bot_name}}{% else %}{{bot_name}}{% endif %}</a>
+        
+        {% if request.user.prompt %}
+          {% for p in request.user.prompt.all %}
+          <div class="d-md-flex d-none align-items-center justify-content-between ">
+            <a class="d-md-inline d-none"  id="template_id" onclick="switchprompt('{{p.id}}')">{{p.bot_name}}</a>
+            <div class="form-check d-flex px-md-1 px-0 align-items-baseline ">
+              <figure class="text-white px-md-3 px-0 d-md-block d-none" onclick="openeditprompt('{{p.id}}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pen" viewBox="0 0 16 16">
+                  <path d="m13.498.795.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001zm-.644.766a.5.5 0 0 0-.707 0L1.95 11.756l-.764 3.057 3.057-.764L14.44 3.854a.5.5 0 0 0 0-.708l-1.585-1.585z"/>
+                </svg>
+              </figure>
+              <figure onclick="opendelmodal('{{p.title}}', '{{p.bot_name}}', '{{p.id}}')" class="px-md-3 px-0 d-md-block d-none text-white"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6Z"/>
+                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1ZM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118ZM2.5 3h11V2h-11v1Z"/>
+              </svg></figure>
+              <!-- <input class="form-check-input" type="radio" name="flexRadioDefault" id="template_id" onchange="switchprompt('{{p.id}}')" value="{{p.id}}"> -->
+            </div>
+            
+          </div>
+          {% endfor %}
+        {% endif %}
+        <a class="text-white block" data-bs-toggle="modal" data-bs-target="#promptmodal"> Add Prompt</a>
+        <a class="text-white block" ondblclick="openeditprompt()" onclick="switchprompt()">Default Prompt</a>
+        <a class="text-white block" data-bs-toggle="modal" data-bs-target="#check"> Generate Image</a>
+        <a href="{% url 'chat:gallery' %}">Gallery</a>
+        <a href="{% url 'logout' %}">Logout</a>
+        {% else %}
+        <a href="{% url 'sign-up' %}">Sign-Up</a>
+        <a href="{% url 'login' %}">Login</a>
+        {% endif %}
+        {% comment %} <div id="imageContainer" class="btn btn-primary" onclick='get_image()'>Image</div> {% endcomment %}
+    </div>
+</aside>
+
+
+<div class="main-content">
+  {% block content %}
+
+  {% endblock %}
+</div>
+
+  
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+{% block script %} 
+
+{% endblock %}
+
+
+<!-- Add Prompt Modal -->
+<div class="modal fade" id="promptmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add Prompt</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <form  id="promptform" method="post">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" name="title" id="title" placeholder="Title">
+                <p class="text-danger" id="etitle"></p>
+              </div>
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" class="form-control" name="bot_name" id="bot_name_" placeholder="Name of your choice">
+                <p class="text-danger" id="ebot_name"></p>
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Give Detailed Description</label>
+                <textarea class="form-control" id="description" name="description" rows="8"></textarea>
+                <p class="text-danger" id="edescription"></p>
+              </div>
+        </div>
+        <div class="modal-footer">
+            <ul id="errorList"></ul>
+           <button class="m-btn" type="submit">Submit</button>
+        </div>
+      </form>
+      </div>
+    </div>
+  </div>
+<!--End Modal--> 
+
+<!-- Edit Prompt Modal -->
+<div class="modal fade" id="prompteditmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Edit Prompt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+          <form  id="editpromptform" method="post">
+          {% csrf_token %}
+          
+          <div class="mb-3">
+              <label class="form-label">Title</label>
+              <input type="text" class="form-control" name="title" id="edittitle" placeholder="Title">
+              <p class="text-danger" id="edtitle"></p>
+            </div>
+          <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" name="bot_name" id="editbot_name_" placeholder="Name of your choice">
+              <p class="text-danger" id="edbot_name"></p>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Give Detailed Description</label>
+              <textarea class="form-control" id="editdescription" name="description" rows="8"></textarea>
+              <p class="text-danger" id="eddescription"></p>
+            </div>
+      </div>
+      <div class="modal-footer">
+          
+         <button class="m-btn" type="submit">Submit</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+<!--End Modal--> 
+
+
+<!-- Del Modal -->
+<div class="modal fade" id="delmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="delmodelbody">
+        
+      </div>
+      <div class="modal-footer" id="delmodelfooter">
+      
+      </div>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+
+<!-- Error Modal -->
+<div class="modal" id="errorModal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Error</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% for message in messages %}
+          <p>{{ message}}</p>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="m-btn" data-bs-dismiss="modal" >Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+<!--Default Prompt Modal-->
+<div class="modal" id="defaultpromptmodal" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">AVA</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      
+      <div class="modal-body" id="def_prompt_template">
+        
+      </div>
+      <div class="modal-footer d-flex justify-content-between">
+        <p class="text-primary">This cannot be edited</p>
+        <button type="button" class="m-btn" data-bs-dismiss="modal" >Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+<!-- Text2Image Modal -->
+<div class="modal fade" id="check" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Text To Image</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" >
+          <form action="{% url 'chat:gallery' %}" id="imageform" method="post" >
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label">Image Title</label>
+              <input class="form-control" id="exampleFormControlTextarea1" name="image_title" >
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label">Image Prompt</label>
+              <textarea class="form-control" id="exampleFormControlTextarea1" name="image_prompt" rows="3"></textarea>
+            </div>
+      </div>
+      <div class="modal-footer" >
+          <button class="m-btn">Submit</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+<!--End Modal-->
+
+
+
+<script src="{% static 'scripts/base.js' %}"></script>
+
+<script src="{% static 'scripts/home.js' %}"></script>
+
+<script>
+  {% if messages %}
+    $(document).ready(function() {
+      $('#errorModal').modal('show');
+    });
+  {% endif %}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block stylecontent %}
+<style>
+
+
+ .login{
+  width:50%;
+  margin: auto;
+  margin-top: 10%;
+ }
+  
+  #id_username{
+    width: 70%;
+  }
+  #id_password{
+    width: 70%;
+  }
+
+  ul{
+    list-style: none;
+    list-style-type: none;
+  }
+  .errorlist{
+    color: rgb(255, 17, 0);
+  }
+  .helptext {
+    display: none;
+  }
+</style>
+{% endblock %}
+{% block content %}  
+    <div class="login">
+      <div class="form">
+      <form class="form form-control" action="" method="post" enctype="multipart/form-data">  
+      <h2 class="text-center">Login</h2>
+      <table class=" table border table-striped">
+        {% csrf_token %}
+         {{ form.as_table }}  
+        {% for error in field.errors %}
+          {{ error }}
+        {% endfor %}
+    
+    </table>
+       
+        <button class="m-btn button my-2" type="submit">Submit</button>
+       
+      </form>
+    </div>
+    </div>
+  {% endblock %}

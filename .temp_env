@@ -1,0 +1,13 @@
+OPENAI_API_KEY=
+ELEVEN_LABS_API_KEY=
+
+# For Telegram
+TELEGRAM_TOKEN=
+
+# For Whatsapp
+ACCOUNT_SID=
+AUTH_TOKEN=
+
+
+#Hugging Face Hub API Token
+HUGGINGFACEHUB_API_TOKEN=
